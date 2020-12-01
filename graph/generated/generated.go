@@ -219,6 +219,19 @@ var sources = []*ast.Source{
 #
 # https://gqlgen.com/getting-started/
 
+type Query {
+  todos: [Todo!]!
+#  browse(id: String!): BrowseResult!
+}
+
+type Mutation {
+  createTodo(input: NewTodo!): Todo!
+}
+`, BuiltIn: false},
+	{Name: "graph/schema.todo.graphqls", Input: `# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
 type Todo {
   id: ID!
   text: String!
@@ -231,18 +244,11 @@ type User {
   name: String!
 }
 
-type Query {
-  todos: [Todo!]!
-}
-
 input NewTodo {
   text: String!
   userId: String!
 }
-
-type Mutation {
-  createTodo(input: NewTodo!): Todo!
-}`, BuiltIn: false},
+`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
 

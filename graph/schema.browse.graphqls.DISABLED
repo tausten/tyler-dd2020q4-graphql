@@ -1,0 +1,86 @@
+# GraphQL TuneIn "browse-like" schema model PoC
+
+# NOTE: For separation of create vs. response models, I'm taking the type name pattern of `Thing` for response model and `NewThing`
+# for creation model...  so by default, when reading model names, you're reading response models unless you see the `New` prefix.
+
+# Any localizable text should be returned 
+type LocalizableText {
+  default: String!
+  localized: String!
+}
+
+interface IGuideItem {
+  id: ID!
+  title: LocalizableText
+  subtitle: LocalizableText
+  description: LocalizableText
+}
+
+# NOTE: There is no "interface inherits from and extends another interface" support, but there is multi-implement
+# so we're stuck with the concretes doing the thing... 
+interface IContainer {
+  items: [IGuideItem]!
+}
+
+type Category implements IGuideItem & IContainer {
+  id: ID!
+  title: LocalizableText
+  subtitle: LocalizableText
+  description: LocalizableText
+
+  items: [IGuideItem]!
+
+  categoryDetails: String!   # placeholder for the extra bits that are specific to this concrete type
+}
+
+type RollUp implements IGuideItem & IContainer {
+  id: ID!
+  title: LocalizableText
+  subtitle: LocalizableText
+  description: LocalizableText
+
+  items: [IGuideItem]!
+
+  rollupDetails: String!   # placeholder for the extra bits that are specific to this concrete type
+}
+
+type Prompt implements IGuideItem {
+  id: ID!
+  title: LocalizableText
+  subtitle: LocalizableText
+  description: LocalizableText
+
+  promptDetails: String!  # placeholder for the extra bits that are specific to this concrete type
+}
+
+type Station implements IGuideItem {
+  id: ID!
+  title: LocalizableText
+  subtitle: LocalizableText
+  description: LocalizableText
+
+  stationDetails: String!  # placeholder for the extra bits that are specific to this concrete type
+}
+
+type StationProgram implements IGuideItem {
+  id: ID!
+  title: LocalizableText
+  subtitle: LocalizableText
+  description: LocalizableText
+
+  programDetails: String!  # placeholder for the extra bits that are specific to this concrete type
+}
+
+type Podcast implements IGuideItem {
+  id: ID!
+  title: LocalizableText
+  subtitle: LocalizableText
+  description: LocalizableText
+
+  podcastDetails: String!  # placeholder for the extra bits that are specific to this concrete type
+}
+
+type BrowseResult {
+  root: IGuideItem
+  status: String! # placeholder for "status-like" stuff in the result
+}
