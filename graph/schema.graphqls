@@ -4,7 +4,7 @@
 
 type Query {
   todos: [Todo!]!
-#  browse(id: String!): BrowseResult!
+  farm(id: ID!): QueryFarmResult!
 }
 
 type Mutation {

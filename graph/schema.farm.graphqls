@@ -71,6 +71,11 @@ type Farm implements Node & Named {
 
 }
 
+type QueryFarmResult {
+  data: Farm
+  errors: [String!] # TODO - placeholder for error communication - instead, could return the union of possible errors
+}
+
 # Farm has zones (eg. House, Barn, Field(s)), Barn has Animal(s), Field has Animal(s), House has people
 
 # TODO: Return a Farm with it's zones...  sort out how client can see the aggregate of the properties 

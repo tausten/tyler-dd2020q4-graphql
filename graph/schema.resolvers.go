@@ -28,6 +28,20 @@ func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
 	return r.todos, nil
 }
 
+func (r *queryResolver) Farm(ctx context.Context, id string) (*model.QueryFarmResult, error) {
+	farmData := r.farmRepository.GetFarm(id)
+
+	var farm *model.Farm
+	if farmData != nil {
+		farm = &model.Farm{
+			ID:   farmData.ID,
+			Name: farmData.Name,
+		}
+	}
+
+	return &model.QueryFarmResult{Data: farm}, nil
+}
+
 // Mutation returns generated.MutationResolver implementation.
 func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
 

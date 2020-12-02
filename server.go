@@ -9,6 +9,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/tausten/tyler-dd2020q4-graphql/graph"
 	"github.com/tausten/tyler-dd2020q4-graphql/graph/generated"
+	"github.com/tausten/tyler-dd2020q4-graphql/repository"
 )
 
 const defaultPort = "8080"
@@ -19,7 +20,9 @@ func main() {
 		port = defaultPort
 	}
 
-	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
+	di := graph.CreateResolver(&repository.FakeFarmRepository{})
+
+	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: di}))
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	http.Handle("/query", srv)
