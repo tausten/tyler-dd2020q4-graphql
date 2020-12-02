@@ -1,0 +1,5 @@
+# GraphQL anything related to the standard "Node" interface pattern
+
+interface Node {
+  id: ID!
+}
