@@ -11,6 +11,7 @@ type FarmRepository interface {
 
 type FakeFarmRepository struct {
 	// TODO put state stuff in here
+	farms map[string]FarmData
 }
 
 func (*FakeFarmRepository) GetFarm(id string) *FarmData {

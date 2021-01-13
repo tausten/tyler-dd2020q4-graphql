@@ -31,15 +31,18 @@ func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
 func (r *queryResolver) Farm(ctx context.Context, id string) (*model.QueryFarmResult, error) {
 	farmData := r.farmRepository.GetFarm(id)
 
-	var farm *model.Farm
+	farmResult := model.QueryFarmResult{}
+
 	if farmData != nil {
-		farm = &model.Farm{
+		farmResult.Data = &model.Farm{
 			ID:   farmData.ID,
 			Name: farmData.Name,
 		}
+	} else {
+		farmResult.Errors = []string{"FARM NOT FOUND"}
 	}
 
-	return &model.QueryFarmResult{Data: farm}, nil
+	return &farmResult, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.
