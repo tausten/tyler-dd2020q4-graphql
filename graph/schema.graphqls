@@ -4,7 +4,6 @@
 
 type Query {
   todos: [Todo!]!
-  farm(id: ID!): QueryFarmResult!
 }
 
 type Mutation {

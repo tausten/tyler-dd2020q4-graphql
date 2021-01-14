@@ -20,7 +20,7 @@ func main() {
 		port = defaultPort
 	}
 
-	di := graph.CreateResolver(&repository.FakeFarmRepository{})
+	di := graph.CreateResolver(repository.NewInMemoryTodoRepository())
 
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: di}))
 

@@ -5,44 +5,57 @@ package graph
 
 import (
 	"context"
-	"fmt"
-	"math/rand"
 
 	"github.com/tausten/tyler-dd2020q4-graphql/graph/generated"
 	"github.com/tausten/tyler-dd2020q4-graphql/graph/model"
+	"github.com/tausten/tyler-dd2020q4-graphql/repository"
 )
 
 func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
-	todo := &model.Todo{
+
+	newItem := &repository.TodoItem{
+		ID:     nil,
 		Text:   input.Text,
-		ID:     fmt.Sprintf("T%d", rand.Int()),
+		Done:   false,
 		UserID: input.UserID,
 	}
 
-	r.todos = append(r.todos, todo)
+	items, errors := r.todoRepository.Upsert([]*repository.TodoItem{newItem})
+
+	// NOTE: The repository can take care of if/when it needs to ensure referential integrity of the user foreign key, and report
+	// violations as error here.
+	if errors[0] != nil {
+		return nil, errors[0]
+	}
+
+	todo := &model.Todo{
+		Text:   items[0].Text,
+		ID:     items[0].ID.Value,
+		UserID: items[0].UserID,
+		Done:   items[0].Done,
+	}
 
 	return todo, nil
 }
 
 func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	return r.todos, nil
-}
-
-func (r *queryResolver) Farm(ctx context.Context, id string) (*model.QueryFarmResult, error) {
-	farmData := r.farmRepository.GetFarm(id)
-
-	farmResult := model.QueryFarmResult{}
-
-	if farmData != nil {
-		farmResult.Data = &model.Farm{
-			ID:   farmData.ID,
-			Name: farmData.Name,
-		}
-	} else {
-		farmResult.Errors = []string{"FARM NOT FOUND"}
+	items, err := r.todoRepository.GetTodos()
+	if err != nil {
+		return nil, err
 	}
 
-	return &farmResult, nil
+	result := make([]*model.Todo, len(items))
+
+	for i, v := range items {
+		result[i] = &model.Todo{
+			ID:     v.ID.Value,
+			Text:   v.Text,
+			Done:   v.Done,
+			UserID: v.UserID,
+		}
+	}
+
+	return result, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

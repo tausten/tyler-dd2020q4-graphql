@@ -1,7 +1,6 @@
 package graph
 
 import (
-	"github.com/tausten/tyler-dd2020q4-graphql/graph/model"
 	"github.com/tausten/tyler-dd2020q4-graphql/repository"
 )
 
@@ -12,12 +11,11 @@ import (
 // It serves as dependency injection for your app, add any dependencies you require here.
 
 type Resolver struct {
-	todos          []*model.Todo
-	farmRepository repository.FarmRepository
+	todoRepository repository.TodoRepository
 }
 
-func CreateResolver(farmRepository repository.FarmRepository) *Resolver {
+func CreateResolver(todoRepository repository.TodoRepository) *Resolver {
 	return &Resolver{
-		farmRepository: farmRepository,
+		todoRepository: todoRepository,
 	}
 }
