@@ -12,7 +12,6 @@ import (
 )
 
 func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
-
 	newItem := &repository.TodoItem{
 		ID:     nil,
 		Text:   input.Text,
@@ -47,15 +46,20 @@ func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
 	result := make([]*model.Todo, len(items))
 
 	for i, v := range items {
-		result[i] = &model.Todo{
-			ID:     v.ID.Value,
-			Text:   v.Text,
-			Done:   v.Done,
-			UserID: v.UserID,
-		}
+		result[i] = v.ToTodo()
 	}
 
 	return result, nil
+}
+
+func (r *queryResolver) Todo(ctx context.Context, id string) (*model.Todo, error) {
+	matches, errors := r.todoRepository.GetTodosById([]string{id})
+
+	if errors[0] != nil {
+		return nil, errors[0]
+	}
+
+	return matches[0].ToTodo(), nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

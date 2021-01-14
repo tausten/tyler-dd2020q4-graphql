@@ -1,6 +1,10 @@
 package repository
 
-import "strconv"
+import (
+	"strconv"
+
+	"github.com/tausten/tyler-dd2020q4-graphql/graph/model"
+)
 
 type NullableID struct {
 	Value string
@@ -107,4 +111,17 @@ func (r *InMemoryTodoRepository) Delete(ids []string) (errors []error) {
 	}
 
 	return errors
+}
+
+func (ti *TodoItem) ToTodo() *model.Todo {
+
+	if ti == nil {
+		return nil
+	}
+	return &model.Todo{
+		ID:     ti.ID.Value,
+		Text:   ti.Text,
+		Done:   ti.Done,
+		UserID: ti.UserID,
+	}
 }
