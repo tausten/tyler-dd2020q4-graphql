@@ -11,6 +11,22 @@ type NewTodo struct {
 	UserID string `json:"userId"`
 }
 
+type PageInfo struct {
+	StartCursor string `json:"startCursor"`
+	EndCursor   string `json:"endCursor"`
+	HasNextPage bool   `json:"hasNextPage"`
+}
+
+type TodoConnection struct {
+	Edges    []*TodoEdge `json:"edges"`
+	PageInfo *PageInfo   `json:"pageInfo"`
+}
+
+type TodoEdge struct {
+	Node   *Todo  `json:"node"`
+	Cursor string `json:"cursor"`
+}
+
 type User struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`

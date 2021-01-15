@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"encoding/base64"
+	"encoding/json"
 	"strconv"
 
 	"github.com/tausten/tyler-dd2020q4-graphql/graph/model"
@@ -44,11 +46,49 @@ type InMemoryTodoRepository struct {
 	nextID int // Better to use GUID but for faking things out and experimenting, it's easier to type ints instead of copy-paste guids..  :-)
 }
 
+var dummyData []*TodoItem = []*TodoItem{
+	{
+		ID:     &NullableID{Value: "1"},
+		Text:   "Do this first",
+		Done:   false,
+		UserID: "101",
+	},
+	{
+		ID:     &NullableID{Value: "2"},
+		Text:   "Do this next",
+		Done:   false,
+		UserID: "101",
+	},
+	{
+		ID:     &NullableID{Value: "3"},
+		Text:   "AAA",
+		Done:   true,
+		UserID: "102",
+	},
+	{
+		ID:     &NullableID{Value: "4"},
+		Text:   "BBBB",
+		Done:   false,
+		UserID: "102",
+	},
+}
+
+func maxInt(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
+
 func NewInMemoryTodoRepository() TodoRepository {
-	var result TodoRepository
-	result = &InMemoryTodoRepository{
+	result := &InMemoryTodoRepository{
 		items:  map[string]*TodoItem{},
 		nextID: 1,
+	}
+	for _, v := range dummyData {
+		result.items[v.ID.Value] = v
+		possibleNextID, _ := strconv.Atoi(v.ID.Value)
+		result.nextID = maxInt(result.nextID, possibleNextID+1)
 	}
 	return result
 }
@@ -124,4 +164,34 @@ func (ti *TodoItem) ToTodo() *model.Todo {
 		Done:   ti.Done,
 		UserID: ti.UserID,
 	}
+}
+
+type todoCursor struct {
+	I      int    `json:"i"`
+	TodoID string `json:"todoID"`
+	// TODO: other context useful for round-trip for cursor
+}
+
+func (ti *TodoItem) EncodeCursor(index int) string {
+	// NOTE: Cursors can (and should) be dependent upon additional context including ordering, and filtering.. for this simple PoC, we're just using
+	// the index into the in-memory thing
+	cursorObj := &todoCursor{I: index, TodoID: ti.ID.Value}
+	cursorBytes, _ := json.Marshal(cursorObj)
+	result := base64.StdEncoding.EncodeToString(cursorBytes)
+
+	return result
+}
+
+func DecodeCursor(cursor string) (*todoCursor, error) {
+	cursorBytes, err := base64.StdEncoding.DecodeString(cursor)
+	if err != nil {
+		return nil, err
+	}
+	var result todoCursor
+	err = json.Unmarshal(cursorBytes, &result)
+	if err != nil {
+		return nil, err
+	}
+
+	return &result, nil
 }

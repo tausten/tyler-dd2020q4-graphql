@@ -37,17 +37,31 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) 
 	return todo, nil
 }
 
-func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
+func (r *queryResolver) Todos(ctx context.Context) (*model.TodoConnection, error) {
 	items, err := r.todoRepository.GetTodos()
 	if err != nil {
 		return nil, err
 	}
 
-	result := make([]*model.Todo, len(items))
+	result := &model.TodoConnection{
+		PageInfo: &model.PageInfo{},
+	}
+
+	if len(items) < 1 {
+		return result, nil
+	}
+
+	result.Edges = make([]*model.TodoEdge, len(items))
 
 	for i, v := range items {
-		result[i] = v.ToTodo()
+		result.Edges[i] = &model.TodoEdge{
+			Node:   v.ToTodo(),
+			Cursor: v.EncodeCursor(i),
+		}
 	}
+
+	result.PageInfo.StartCursor = result.Edges[0].Cursor
+	result.PageInfo.EndCursor = result.Edges[len(result.Edges)-1].Cursor
 
 	return result, nil
 }

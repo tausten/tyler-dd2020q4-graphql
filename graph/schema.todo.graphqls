@@ -2,11 +2,27 @@
 #
 # https://gqlgen.com/getting-started/
 
+type PageInfo {
+  startCursor: String!
+  endCursor: String!
+  hasNextPage: Boolean!
+}
+
 type Todo {
   id: ID!
   text: String!
   done: Boolean!
   user: User!
+}
+
+type TodoConnection {
+  edges: [TodoEdge!]
+  pageInfo: PageInfo!
+}
+
+type TodoEdge {
+  node: Todo!
+  cursor: String!
 }
 
 type User {
